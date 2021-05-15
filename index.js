@@ -51,7 +51,11 @@ var module = (function() {
         var sockid = data["socket"] || 0;
 
         if (sockid in _sockets) {
-            _sockets[sockid]._handle_event(data["event"], data["data"]);
+            if ("data" in data) {
+                _sockets[sockid]._handle_event(data["event"], JSON.parse(data["data"]));
+            } else {
+                _sockets[sockid]._handle_event(data["event"]);
+            }
         }
     }
 

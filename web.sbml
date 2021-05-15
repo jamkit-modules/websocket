@@ -3,6 +3,6 @@
 =object web: id=${web-id}.web, filename=${dir-path}/websocket.html, base-url=http://localhost, \
             javascript-bridge="__$_bridge", uses-browser-user-agent=yes, \
             script-when-loaded=${web-prefix}__on_web_loaded, \
-            style=web
+            style=web, console-message-enabled=yes
 
 =end sbml

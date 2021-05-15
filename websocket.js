@@ -4,6 +4,8 @@ function createSocket(owner, url, protocols, onResult, onError) {
     var socket = new WebSocket(url, protocols);
     var sockid = (Math.random() * 10000).toFixed(0);
 
+    socket.binaryType = "arraybuffer";
+
     socket.onopen = function(event) {
         if (sockid in _socketMap) {
             _notifyEvent(owner, "open", sockid);
@@ -12,7 +14,7 @@ function createSocket(owner, url, protocols, onResult, onError) {
 
     socket.onmessage = function(event) {
         if (sockid in _socketMap) {
-            _notifyEvent(owner, "message", sockid, event.data);
+            _notifyEvent(owner, "message", sockid, Array.from(new Uint8Array(event.data)));
         }
     }
     
@@ -47,11 +49,11 @@ function destroySocket(sockid, onResult, onError) {
     }
 }
 
-function sendData(sockid, send) {
+function sendData(sockid, data, onResult, onError) {
     if (sockid in _socketMap) {
         var socket = _socketMap[sockid];
 
-        socket.send(send);
+        socket.send(data);
 
         onResult();
     } else {
