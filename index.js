@@ -10,6 +10,8 @@ var module = (function() {
             var _handlers = {};
 
             return {
+                sockid: sockid,
+
                 send: function(data) {
                     return new Promise(function(resolve, reject) {
                         webjs.call("sendData", [ sockid, data ])
@@ -108,7 +110,13 @@ var module = (function() {
         destroy: function(socket) {
             return new Promise(function(resolve, reject) {
                 var handler = function() {
-                    
+                    webjs.call("destroySocket", [ socket.sockid ])
+                        .then(function() {
+                            resolve();
+                        })
+                        .catch(function(error) {
+                            reject(error);
+                        });
                 }
 
                 _web_loaded ? handler() : _handlers.push(handler);

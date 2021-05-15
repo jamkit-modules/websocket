@@ -39,7 +39,7 @@ function destroySocket(sockid, onResult, onError) {
     if (sockid in _socketMap) {
         var socket = _socketMap[sockid];
 
-        socket.terminate();
+        socket.close();
 
         delete _socketMap[sockid];
 
