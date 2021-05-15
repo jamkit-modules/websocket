@@ -22,6 +22,8 @@ function createSocket(owner, url, protocols, onResult, onError) {
         if (sockid in _socketMap) {
             _notifyEvent(owner, "close", sockid);
         }
+
+        delete _socketMap[sockid];
     }
     
     socket.onerror = function() {
