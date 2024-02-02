@@ -1,24 +1,24 @@
-var module = (function() {
+const module = (function() {
     const webjs = require("webjs-helper");
 
     var _id = "", _dir_path = "", _handlers = [];
-    var _web_prefix = "", _sockets = {};
+    var _sbml_prefix = "", _sockets = {};
     var _web_loaded = false;
 
     function _create_socket(sockid) {
-        return (function() {
-            var _handlers = {};
+        return (() => {
+            const _handlers = {};
 
             return {
                 sockid: sockid,
 
                 send: function(data) {
-                    return new Promise(function(resolve, reject) {
+                    return new Promise((resolve, reject) => {
                         webjs.call("sendData", [ sockid, data ])
-                            .then(function() {
+                            .then(() => {
                                 resolve();
                             })
-                            .catch(function(error) {
+                            .catch((error) => {
                                 reject(error);
                             });
                     });
@@ -41,7 +41,7 @@ var module = (function() {
         if (data["url"].startsWith("http://localhost")) {
             webjs.import(_dir_path + "/websocket.js");
 
-            _handlers.forEach(function(handler) {
+            _handlers.forEach((handler) => {
                 handler();
             });
 
@@ -50,7 +50,7 @@ var module = (function() {
     }
 
     function _on_socket_event(data) {
-        var sockid = data["socket"] || 0;
+        const sockid = data["socket"] || 0;
 
         if (sockid in _sockets) {
             if ("data" in data) {
@@ -63,42 +63,46 @@ var module = (function() {
 
     return {
         initialize: function(id) {
-            var web_prefix = id.replace(".", "_");
-            var dir_path = this.__ENV__["dir-path"];
+            const sbml_prefix = id.replace(".", "_");
+            const dir_path = this.__ENV__["dir-path"];
 
-            global[web_prefix + "__on_web_loaded"] = function(data) {
+            global[`${sbml_prefix}__on_web_loaded`] = function(data) {
+                if (data["is-for-main-frame"] === "yes") {
+                    webjs.initialize(`${id}.web`, "__web_bridge__");
+                }
+
                 _on_web_loaded(data);
             }
-            global[web_prefix + "__on_socket_event"] = function(data) {
+
+            global[`${sbml_prefix}__on_socket_event`] = function(data) {
                 _on_socket_event(data);
             }
 
-            webjs.initialize(id + ".web", "__$_bridge");
             view.object(id).action("load", { 
                 "filename": dir_path + "/web.sbml",
                 "dir-path": dir_path,
-                "web-id": id, 
-                "web-prefix": web_prefix
+                "sbml-id": id, 
+                "sbml-prefix": sbml_prefix
             });
 
             _id = id, _dir_path = dir_path;
-            _web_prefix = web_prefix;
+            _sbml_prefix = sbml_prefix;
 
             return this;
         },
         
         create: function(url, protocols) {
-            return new Promise(function(resolve, reject) {
-                var handler = function() {
-                    webjs.call("createSocket", [ _web_prefix, url, protocols ])
-                        .then(function(sockid) {
+            return new Promise((resolve, reject) => {
+                const handler = function() {
+                    webjs.call("createSocket", [ _sbml_prefix, url, protocols ])
+                        .then((sockid) => {
                             var socket = _create_socket(sockid);
 
                             _sockets[sockid] = socket;
 
                             resolve(socket);
                         })
-                        .catch(function(error) {
+                        .catch((error) => {
                             reject(error);
                         });
                 }
@@ -108,13 +112,13 @@ var module = (function() {
         },
 
         destroy: function(socket) {
-            return new Promise(function(resolve, reject) {
-                var handler = function() {
+            return new Promise((resolve, reject) => {
+                const handler = function() {
                     webjs.call("destroySocket", [ socket.sockid ])
-                        .then(function() {
+                        .then(() => {
                             resolve();
                         })
-                        .catch(function(error) {
+                        .catch((error) => {
                             reject(error);
                         });
                 }

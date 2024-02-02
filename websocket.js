@@ -64,7 +64,7 @@ function sendData(sockid, data, onResult, onError) {
 }
 
 function _notifyEvent(owner, event, sockid, data) {
-    __$_bridge.postMessage(JSON.stringify({
+    __web_bridge__.postMessage(JSON.stringify({
         "script": owner + "__on_socket_event",
         "socket": sockid,
         "event": event,
